@@ -1,16 +1,28 @@
 import cv2
 import os
 def extract_frames(url_path,output_dir):
+    '''
+    Acts as initial feed into the SuperSlomo Model
+    The Frames are stored in an output directory which is then loaded into the SuperSlomo Model.
+    :param url_path:
+    :param output_dir:
+    :return: None
+    '''
     os.makedirs(output_dir, exist_ok=True)
     frame_count=0
     cap=cv2.VideoCapture(url_path)
-    while cap.isOpened() and frame_count<10:
-        ret,frame=cap.read()
+    total_frames=int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps=int(cap.get(cv2.CAP_PROP_FPS))
+    while cap.isOpened():
+        ret,frame=cap.read() # frame is a numpy array
         if not ret:
             break
         frame_name=f"{frame_count}.png"
-        cv2.imwrite(os.path.join(output_dir, frame_name), frame)
         frame_count+=1
+        cv2.imwrite(os.path.join(output_dir, frame_name), frame)
     cap.release()
-extract_frames("C:/Users/BRIDGES/Downloads/Video1.mp4","output")
-# this is a test change to merge later
+def downsample(video_path,output_dir,target_fps):
+    pass
+if __name__=="__main__": # sets the __name__ variable to __main__ for this script
+
+    extract_frames("Test.mp4","output")

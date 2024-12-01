@@ -1,0 +1,7 @@
+ we need to decide how many frames our output video should have
+ now assume that the video is 1 min long at 30 fps.
+ k factor=fps_output/fps_input
+ k=90/30
+ k=3
+ # the output video will have T(total time(sec))x fps_output=60x90=5400
+ 
