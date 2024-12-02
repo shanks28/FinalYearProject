@@ -8,3 +8,6 @@
 Need to atach Unet arch
 
 
+Interpolation Factor(k)=output fps/inputFps
+Number of frames Required between 2 frames(n)=k-1
+Time Step=1/n+1,2/n+1
