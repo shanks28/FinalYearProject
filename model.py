@@ -178,7 +178,7 @@ class UNet(nn.Module):
         self.up5   = up(64, 32)
         self.conv3 = nn.Conv2d(32, outChannels, 3, stride=1, padding=1)
         
-    def forward(self, x):
+    def forward(self, x,time_steps=None):
         """
         Returns output tensor after passing input `x` to the neural network.
 
@@ -192,6 +192,9 @@ class UNet(nn.Module):
             tensor
                 output of the UNet.
         """
+        if time_steps:
+            time_steps = time_steps.view(-1,1,1,1).expand(-1,1,x.size(2),x.size(3))
+            torch.cat((x,time_steps),1)
 
 
         x  = F.leaky_relu(self.conv1(x), negative_slope = 0.1)
