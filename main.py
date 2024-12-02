@@ -1,17 +1,29 @@
 import torch
 from model import UNet
-from frames import load_frames,save_frames
+from frames import load_frames
 from PIL import Image
 from torchvision.transforms import transforms,ToTensor
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def save_frames(tensor,out_path)->None:
+    image=normalize_frames(tensor)
+    image=Image.fromarray(image)
+    image.save(out_path)
+def normalize_frames(tensor):
+    tensor=tensor.squeeze(0).detach().cpu()
+    min_val=tensor.min()
+    max_val=tensor.max()
+    tensor=(tensor-min_val)/(max_val-min_val)
+    tensor=(tensor*255).byte()
+    tensor=tensor.permute(1,2,0).numpy()
+    return tensor
 def time_steps(input_fps,output_fps)->list[float]:
     if output_fps<=input_fps:
         return []
     k=output_fps//input_fps
     n=k-1
     return [i/n+1 for i in range(1,n+1)]
-def expand_channels(tensor,target):
+def expand_channels(tensor,target): # adding filler channels
     batch_size,current_channels,height,width=tensor.shape
     if current_channels>=target:
         return tensor
@@ -21,6 +33,7 @@ def expand_channels(tensor,target):
 def interpolate(model_FC,model_AT,A,B,input_fps,output_fps)-> list[float]:
     interval=time_steps(input_fps,output_fps)
     input_tensor=torch.cat((A,B),dim=1)
+    print(interval)
     with torch.no_grad():
         flow_output=model_FC(input_tensor)
         flow_output=expand_channels(flow_output,20)
@@ -44,8 +57,7 @@ def solve():
     model_FC.eval()
     A=load_frames("output/1.png")
     B=load_frames("output/69.png")
-    interpolated_frames=interpolate(model_FC,model_AT,A,B,60,120)
-    print(interpolated_frames)
+    interpolated_frames=interpolate(model_FC,model_AT,A,B,30,60)
     for index,value in enumerate(interpolated_frames):
         save_frames(value[:,:3,:,:],"Result_Test/image{}.png".format(index+1))
 

@@ -40,17 +40,7 @@ def load_frames(path,size=(128,128)) -> tensor: # converts PIL image to tensor o
     tensor = ToTensor()
     resized_image=Resize(size)(image)
     return tensor(resized_image).unsqueeze(0).to(device)
-def save_frames(Tensor,output_path)->None: # Tensor to image
-    '''
-    Used to Save the Interpolated frame into the output directory.
-    :param Tensor:
-    :param output_path:
-    :return:
-    '''
-    transform=ToPILImage()
-    image=Tensor.squeeze(0).cpu()
-    image=transform(image)
-    image.save(output_path)
+
 
 
 if __name__ == "__main__":  # sets the __name__ variable to __main__ for this script
