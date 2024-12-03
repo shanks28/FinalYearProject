@@ -107,33 +107,19 @@ class up(nn.Module):
         self.conv1 = nn.Conv2d(inChannels,  outChannels, 3, stride=1, padding=1)
         # (2 * outChannels) is used for accommodating skip connection.
         self.conv2 = nn.Conv2d(2 * outChannels, outChannels, 3, stride=1, padding=1)
-           
+
     def forward(self, x, skpCn):
-        """
-        Returns output tensor after passing input `x` to the neural network
-        block.
-
-        Parameters
-        ----------
-            x : tensor
-                input to the NN block.
-            skpCn : tensor
-                skip connection input to the NN block.
-
-        Returns
-        -------
-            tensor
-                output of the NN block.
-        """
-
-        # Bilinear interpolation with scaling 2.
-        x = F.interpolate(x, scale_factor=2, mode='bilinear')
-        # Convolution + Leaky ReLU
-        x = F.leaky_relu(self.conv1(x), negative_slope = 0.1)
-        # Convolution + Leaky ReLU on (`x`, `skpCn`)
-        x = F.leaky_relu(self.conv2(torch.cat((x, skpCn), 1)), negative_slope = 0.1)
+        # Upsample x
+        x = F.interpolate(x, scale_factor=2, mode='bilinear', align_corners=True)
+        # Match dimensions by cropping the skip connection (skpCn) to match x
+        if x.size(-1) != skpCn.size(-1):
+            skpCn = skpCn[:, :, :, :x.size(-1)]
+        if x.size(-2) != skpCn.size(-2):
+            skpCn = skpCn[:, :, :x.size(-2), :]
+        # Concatenate and apply convolutions
+        x = F.leaky_relu(self.conv1(x), negative_slope=0.1)
+        x = F.leaky_relu(self.conv2(torch.cat((x, skpCn), 1)), negative_slope=0.1)
         return x
-
 
 
 class UNet(nn.Module):
