@@ -1,9 +1,5 @@
 import cv2
 import os
-from PIL import Image
-from torchvision.transforms import transforms, ToTensor
-from torch import tensor
-from torchvision.transforms import ToPILImage,Resize
 import torch
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -33,13 +29,6 @@ def extract_frames(url_path, output_dir) -> int :
 
 def downsample(video_path, output_dir, target_fps):
     pass
-
-
-def load_frames(path,size=(128,128)) -> tensor: # converts PIL image to tensor on the GPU
-    image = Image.open(path).convert('RGB')
-    tensor = ToTensor()
-    resized_image=Resize(size)(image)
-    return tensor(resized_image).unsqueeze(0).to(device)
 
 
 
