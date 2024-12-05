@@ -23,8 +23,10 @@ def normalize_frames(tensor):
     return tensor
 def laod_allframes(frame_dir):
     frames_path = sorted(
-        [os.path.join(frame_dir, f) for f in os.listdir(frame_dir) if f.endswith('.png')]
+        [os.path.join(frame_dir, f) for f in os.listdir(frame_dir) if f.endswith('.png')],
+        key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[-1])
     )
+    print(frames_path)
     for frame_path in frames_path:
         yield load_frames(frame_path)
 def load_frames(image_path)->torch.Tensor:
@@ -90,7 +92,6 @@ def interpolate(model_FC, A, B, input_fps, output_fps)-> list[torch.Tensor]:
             generated_frames.append(interpolated_frame)
     return generated_frames
 
-
 def warp_frames(frame, flow):
     b, c, h, w = frame.size()
     i,j,flow_h, flow_w = flow.size()
@@ -110,11 +111,18 @@ def warp_frames(frame, flow):
     warped_frame = F.grid_sample(frame, grid, align_corners=True,mode='bilinear', padding_mode='border')
     return warped_frame
 def frames_to_video(frame_dir,output_video,fps):
-    frame_pattern = os.path.join(frame_dir, "frame_.png")
-    subprocess.run([
+    frame_files = sorted(
+        [f for f in os.listdir(frame_dir) if f.endswith('.png')],
+        key=lambda x: int(os.path.splitext(x)[0].split('_')[-1])
+    )
+    print(frame_files)
+    for i, frame in enumerate(frame_files):
+        os.rename(os.path.join(frame_dir, frame), os.path.join(frame_dir, f"frame_{i}.png"))
+    frame_pattern = os.path.join(frame_dir, "frame_%d.png")
+    subprocess.run([ #  run shell command
         "ffmpeg", "-framerate", str(fps), "-i", frame_pattern,
         "-c:v", "libx264", "-pix_fmt", "yuv420p", output_video
-    ])
+    ],check=True)
 def solve():
     checkpoint = torch.load("SuperSloMo.ckpt")
     model_FC = UNet(6, 4).to(device)  # Initialize flow computation model
@@ -124,11 +132,11 @@ def solve():
     model_AT.load_state_dict(checkpoint["state_dictAT"], strict=False)  # Load weights
     model_AT.eval()
     frames_dir="output"
-    input_fps=60
+    input_fps=59
     output_fps=120
-    output_dir="interpolated_frames"
+    output_dir="interpolated_frames2"
     interpolate_video(frames_dir,model_FC,input_fps,output_fps,output_dir)
-    final_video="result.mp4"
+    final_video="result6.mp4"
     frames_to_video(output_dir,final_video,output_fps)
 
 def main():
