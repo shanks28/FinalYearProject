@@ -20,7 +20,7 @@ def extract_frames(url_path, output_dir) -> int :
         ret, frame = cap.read()  # frame is a numpy array
         if not ret:
             break
-        frame_name = f"{frame_count}.png"
+        frame_name = f"frame_{frame_count}.png"
         frame_count += 1
         cv2.imwrite(os.path.join(output_dir, frame_name), frame)
     cap.release()
@@ -34,4 +34,4 @@ def downsample(video_path, output_dir, target_fps):
 
 if __name__ == "__main__":  # sets the __name__ variable to __main__ for this script
 
-    extract_frames("Test.mp4", "output")
+    print(extract_frames("Test.mp4", "output"))
