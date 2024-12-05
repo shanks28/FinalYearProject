@@ -1,3 +1,4 @@
+import shutil
 import cv2
 import os
 import torch
@@ -11,20 +12,24 @@ def extract_frames(url_path, output_dir) -> int :
     :param output_dir:
     :return: None
     '''
-    os.makedirs(output_dir, exist_ok=True)
-    frame_count = 0
-    cap = cv2.VideoCapture(url_path)
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    while cap.isOpened():
-        ret, frame = cap.read()  # frame is a numpy array
-        if not ret:
-            break
-        frame_name = f"frame_{frame_count}.png"
-        frame_count += 1
-        cv2.imwrite(os.path.join(output_dir, frame_name), frame)
-    cap.release()
-    return fps
+    try:
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
+        frame_count = 0
+        cap = cv2.VideoCapture(url_path)
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
+        while cap.isOpened():
+            ret, frame = cap.read()  # frame is a numpy array
+            if not ret:
+                break
+            frame_name = f"frame_{frame_count}.png"
+            frame_count += 1
+            cv2.imwrite(os.path.join(output_dir, frame_name), frame)
+        cap.release()
+        return fps
+    except Exception as e:
+        print(e)
 
 
 def downsample(video_path, output_dir, target_fps):
@@ -34,4 +39,4 @@ def downsample(video_path, output_dir, target_fps):
 
 if __name__ == "__main__":  # sets the __name__ variable to __main__ for this script
 
-    print(extract_frames("Test.mp4", "output"))
+    print(extract_frames("Test2-15fps.mp4", "output"))
