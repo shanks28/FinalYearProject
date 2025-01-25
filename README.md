@@ -16,13 +16,12 @@ Ensure you have the following installed on your system:
 - Python 3.8+
 - PyTorch
 - OpenCV
-- NumPy
-- Other dependencies listed in `requirements.txt`
+- Other dependencies listed in `req.txt`
 
 To install the required dependencies, run:
 
 ```bash
-pip install -r requirements.txt
+pip install -r req.txt
 ```
 
 ## Usage
@@ -54,8 +53,7 @@ This command will:
 
 - `main.py` : The main script for running the interpolation.
 - `models/` : Contains the U-Net architecture and Super SloMo weights.
-- `requirements.txt` : Lists all the dependencies required for the project.
-- `README.md` : Documentation for the project.
+- `req.txt` : Lists all the dependencies required for the project.
 
 ## How It Works
 
@@ -65,7 +63,7 @@ This command will:
 
 ## Acknowledgments
 
-- This project utilizes pre-trained weights from the [Super SloMo](https://github.com/avinashpaliwal/Super-SloMo) repository.
+- This project utilizes pre-trained weights from the [Super SloMo] Model.
 - The U-Net architecture was adapted for efficient frame interpolation.
 
 ## Contributing
@@ -77,5 +75,3 @@ Feel free to contribute by submitting issues or pull requests to improve this pr
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
 ---
-
-For any questions or suggestions, please open an issue in this repository.
